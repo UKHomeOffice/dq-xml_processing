@@ -1,0 +1,23 @@
+VERSION: 1.0.0.1
+DATABASE: DQ_db
+USER: XXX
+HOST: 10.
+PORT: 5432
+GPLOAD:
+   INPUT:
+    - SOURCE:
+         PORT: 8082
+         FILE:
+           - E:/dq/nrt/s4_file_ingest/fms/tbl_fms_carrier_volume_type.csv
+    - COLUMNS:
+           - carrier_iata_code: text
+           - volume_type_id: smallint
+    - FORMAT: csv
+    - QUOTE: '"'
+    - DELIMITER: ','
+    - HEADER: true
+   OUTPUT:
+    - TABLE: dv_load.load_tbl_fms_carrier_volume_type
+    - MODE: INSERT
+   PRELOAD:
+    - TRUNCATE: true 

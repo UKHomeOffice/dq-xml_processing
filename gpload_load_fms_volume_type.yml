@@ -1,0 +1,27 @@
+VERSION: 1.0.0.1
+DATABASE: DQ_db
+USER: XXX
+HOST: 
+PORT: 5432
+GPLOAD:
+   INPUT:
+    - SOURCE:
+         PORT: 8082
+         FILE:
+           - E:\dq\nrt\s4_file_ingest\fms\tbl_fms_volume_type.csv
+    - COLUMNS:
+           - tbl_volume_type_id: smallint
+           - volume_type_name: text
+           - volume_type_rollover_period: text
+           - successive_pax_ci_violations_for_carrier_violation: text
+           - successive_crew_ci_violations_for_carrier_violation: text
+           - dq_fms_event_deletion_time_after_std: text
+    - FORMAT: csv
+    - QUOTE: '"'
+    - DELIMITER: ','
+    - HEADER: true
+   OUTPUT:
+    - TABLE: dv_load.load_tbl_fms_volume_type
+    - MODE: INSERT
+   PRELOAD:
+    - TRUNCATE: true 

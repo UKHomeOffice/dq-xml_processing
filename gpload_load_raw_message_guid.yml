@@ -1,0 +1,27 @@
+VERSION: 1.0.0.1
+DATABASE: DQ_db
+USER: XXX
+HOST: 
+PORT: 5432
+GPLOAD:
+   INPUT:
+    - SOURCE:
+         PORT: 8082
+         FILE:
+           - E:\dq\nrt\s4_file_ingest\raw_message_guid_csv\raw_message_guid*.csv
+    - COLUMNS:
+           - guid: text
+           - filepath: text
+           - zipfile: text
+           - filename: text
+    - FORMAT: csv
+    - DELIMITER: ','
+    - QUOTE: '"'
+    - HEADER: false
+    - ERROR_LIMIT: 6
+    - ERROR_TABLE: dv_load.load_raw_message_guid_err
+   OUTPUT:
+    - TABLE: stage.load_raw_message_guid
+    - MODE: INSERT
+   PRELOAD:
+    - TRUNCATE: true 

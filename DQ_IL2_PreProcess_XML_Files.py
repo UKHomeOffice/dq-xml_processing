@@ -5,7 +5,7 @@
 #
 # AUTHOR:       Stewart Lee
 # DATE:         2016/05/20
-# LAST UPDATED: 2016/12/05
+# LAST UPDATED: 2018/02/08
 #
 # DESCRIPTION:  
 #
@@ -19,6 +19,7 @@
 # 20161205      Due to "gpfdist" failing (not in this script) due to files of more than 1MB in size being received, this
 #               script has been updated to reject any files more than 1MB (configurable) in size.  The reject folder
 #               is also configurable.
+# 20180208      Handles line endings and pipes by manually escaping
 #                   
 ##############################################################################################################################
 
@@ -50,7 +51,11 @@ def concat_xml_files(multiprocessing_pool_vars):
     filesize=int(os.stat(full_filename).st_size)
     if filesize < MAX_FILESIZE_BYTES:
         with open(full_filename) as f:
-            concat = f.read() + '|' + ntpath.basename(filename)
+            xml = f.read()
+            xml = xml.replace('\\','\\\\')
+            xml = xml.replace('\n','\\n')
+            xml = xml.replace('|','\\|')
+            concat = xml + '|' + ntpath.basename(filename)
     else:
         shutil.move(full_filename,os.path.join(REJECT_DIR,filename))
     

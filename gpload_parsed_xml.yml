@@ -1,6 +1,6 @@
 VERSION: 1.0.0.1
 DATABASE: DQ_db
-USER: XXXXXX
+USER: wsr
 HOST: 
 PORT: 5432
 GPLOAD:
@@ -8,7 +8,7 @@ GPLOAD:
     - SOURCE:
          PORT: 8082
          FILE:
-           - E:\dq\nrt\s4_file_ingest\xml_inprocess\*.xml.MOD
+           - E:/dq/nrt/s4_file_ingest/xml_inprocess/*.xml.MOD
     - COLUMNS:
            - xml: xml
            - file_name: text
@@ -16,7 +16,8 @@ GPLOAD:
     - ENCODING: utf8
     - MAX_LINE_LENGTH: 1000000
     - ERROR_LIMIT: 1000000
-    - ESCAPE: OFF
+    - ESCAPE: '\'
+    - QUOTE: '"'
     - DELIMITER: '|'
     - ERROR_TABLE: stage.load_s4_parsed_xml_err
    OUTPUT:

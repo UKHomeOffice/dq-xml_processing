@@ -673,6 +673,9 @@ def main(argv):
 
     target_file_dir = os.path.join(root_dir, 'tmp/')
     archive_file_dir = os.path.join(root_dir, 'archive/')
+    archive_parsed__file_dir = os.path.join(archive_file_dir, 'parsed/')
+    archive_stored_file_dir = os.path.join(archive_file_dir, 'stored/')
+    archive_failed_file_dir = os.path.join(archive_file_dir, 'failed/')
     output_file_dir = os.path.join(root_dir, 'out/')
     logfile_dir = os.path.join(root_dir, 'log/')
     raw_file_inprocess_dir = os.path.join(root_dir, 'raw_inprocess/')
@@ -723,7 +726,9 @@ def main(argv):
         move_files([f for f in source_dir_list if re.match(seq_info['RAW']['regex'], f)], source_file_dir, raw_file_inprocess_dir)
 
         info_logger.info('ARCHIVING')
-        move_files([f for f in source_dir_list if re.match(all_regex, f) and not re.match(seq_info['RAW']['regex'], f)], source_file_dir, archive_file_dir)
+        move_files([f for f in source_dir_list if re.match(seq_info['PARSED']['regex'], f)], source_file_dir, archive_parsed_file_dir)
+        move_files([f for f in source_dir_list if re.match(seq_info['FAILED']['regex'], f)], source_file_dir, archive_failed_file_dir)
+        move_files([f for f in source_dir_list if re.match(seq_info['STORED']['regex'], f)], source_file_dir, archive_stored_file_dir)
 
         info_logger.info('CLEANING UP')
         remove_temp_folders(target_file_dir, '^RAW|^PARSED|^STORED|^FAILED')

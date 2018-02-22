@@ -662,6 +662,8 @@ def main(argv):
     mds_db_host = config.get(default_section, 'MDS_DB_HOST')
     mds_db_database = config.get(custom_section, 'MDS_DB_DATABASE')
     mds_db_sql = config.get(custom_section, 'MDS_DB_SQL')
+    mds_db_user = config.get(default_section, 'MDS_DB_USER')
+    mds_db_password = config.get(default_section, 'MDS_DB_PASSWORD')
     max_batch_size = int(config.get(custom_section, 'MAX_BATCH_SIZE'))
     max_output_batch_size = int(config.get(custom_section, 'MAX_OUTPUT_BATCH_SIZE'))
     no_of_processes = int(config.get(custom_section, 'NO_OF_PROCESSES'))

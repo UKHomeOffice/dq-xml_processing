@@ -675,7 +675,7 @@ def main(argv):
 
     target_file_dir = os.path.join(root_dir, 'tmp/')
     archive_file_dir = os.path.join(root_dir, 'archive/')
-    archive_parsed__file_dir = os.path.join(archive_file_dir, 'parsed/')
+    archive_parsed_file_dir = os.path.join(archive_file_dir, 'parsed/')
     archive_stored_file_dir = os.path.join(archive_file_dir, 'stored/')
     archive_failed_file_dir = os.path.join(archive_file_dir, 'failed/')
     output_file_dir = os.path.join(root_dir, 'out/')

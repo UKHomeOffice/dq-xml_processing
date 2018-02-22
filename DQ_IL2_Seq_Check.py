@@ -396,7 +396,7 @@ def is_executive_flight(flight_id, executive_carriers, expected_length):
     return False
 
 
-def check_mds_file(mds_extract, mds_db_sql, mds_db_host, mds_db_database, mds_refresh_hrs=8):
+def check_mds_file(mds_extract, mds_db_sql, mds_db_host, mds_db_database, mds_db_user, mds_db_password, mds_refresh_hrs=8):
     if not os.path.exists(mds_extract):
         info_logger.warn('MDS EXTRACT does not exist - creating file')
         open(mds_extract, 'a').close()
@@ -416,7 +416,7 @@ def check_mds_file(mds_extract, mds_db_sql, mds_db_host, mds_db_database, mds_re
         info_logger.debug('server=%s database=%s' % (mds_db_host, mds_db_database))
 
         try:
-            db = pyodbc.connect(driver='{SQL Server}', server=mds_db_host, database=mds_db_database, autocommit='False')
+            db = pyodbc.connect(driver='{SQL Server}', server=mds_db_host, database=mds_db_database, uid=mds_db_user, pwd=mds_db_password, autocommit='False')
         except Exception, e:
             mds_connect_error = 1
             exception_msg = str(e)
@@ -678,7 +678,7 @@ def main(argv):
     archive_failed_file_dir = os.path.join(archive_file_dir, 'failed/')
     output_file_dir = os.path.join(root_dir, 'out/')
     logfile_dir = os.path.join(root_dir, 'log/')
-    raw_file_inprocess_dir = os.path.join(root_dir, 'raw_inprocess/')
+    raw_file_inprocess_dir = os.path.join(root_dir, 'raw_inprocess/done')
     ga_inprocess_dir = os.path.join(root_dir, 'ga_inprocess/')
     mds_extract_dir = os.path.join(root_dir, 'mds/')
     max_seqs_log = os.path.join(os.path.dirname(__file__), 'MAX_SEQS.ini')
@@ -712,7 +712,7 @@ def main(argv):
         process_mp_unzip_files(pool, source_dir_list, source_file_dir, target_file_dir, seq_info['PARSED']['regex'], no_of_processes=no_of_processes)
 
         info_logger.info('READING MDS EXTRACT')
-        check_mds_file(mds_extract, mds_db_sql, mds_db_host, mds_db_database, mds_refresh_hrs=mds_refresh_hrs)
+        check_mds_file(mds_extract, mds_db_sql, mds_db_host, mds_db_database, mds_db_user, mds_db_password, mds_refresh_hrs=mds_refresh_hrs)
         iata_executive_carriers, icao_executive_carriers = read_mds_extract(mds_extract)
 
         info_logger.info('PARSING XML')

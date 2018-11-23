@@ -248,12 +248,10 @@ def main(argv):
 
     if source_dir_list:
        for filename in source_dir_list:
-           filedate = re.split('_',filename)[1]
            full_filepath=SOURCE_FILE_DIR + filename
            if os.path.isfile(full_filepath) and filename.upper().startswith('RAW'):
-                if not os.path.exists(RAW_DONE_PATH + filedate):
-                    os.mkdir(RAW_DONE_PATH + filedate + '/')
-                shutil.move(full_filepath, RAW_DONE_PATH + filedate + '/' + filename)
+                if os.path.exists(RAW_DONE_PATH):
+                     shutil.move(full_filepath, RAW_DONE_PATH + filename)
 
     else:
        add_log_entry('MOVING FILES TO LOCAL ARCHIVE','No source files')

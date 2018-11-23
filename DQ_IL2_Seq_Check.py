@@ -680,7 +680,7 @@ def main(argv):
     archive_failed_file_dir = os.path.join(archive_file_dir, 'failed/')
     output_file_dir = os.path.join(root_dir, 'out/')
     logfile_dir = os.path.join(root_dir, 'log/')
-    raw_file_inprocess_dir = os.path.join(root_dir, 'raw_inprocess')
+    raw_file_inprocess_dir = os.path.join(root_dir, 'raw_inprocess/')
     ga_inprocess_dir = os.path.join(root_dir, 'ga_inprocess/')
     mds_extract_dir = os.path.join(root_dir, 'mds/')
     max_seqs_log = os.path.join(os.path.dirname(__file__), 'MAX_SEQS.ini')

@@ -248,10 +248,10 @@ def main(argv):
       ATTEMPT_NO+=1
 
     ##############################################################################################################################
-    # Move files to WFLS
+    # Move files to local 'done' folder
     ##############################################################################################################################
 
-    print '\n*** Moving files to Local folder'
+    print '\n*** Moving files to local done folder'
 
     if source_dir_list:
        for filename in source_dir_list:

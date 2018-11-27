@@ -30,7 +30,7 @@
 
 ### IMPORT PYTHON MODULES ####################################################################################################
 from __future__ import with_statement
-import os, zipfile, re, time, sys, shutil, fileinput, datetime, ConfigParser, subprocess
+import os, zipfile, re, time, sys, shutil, fileinput, datetime, ConfigParser, subprocess, boto3
 
 #from datetime import datetime
 
@@ -40,7 +40,7 @@ YYYYMMDDHHMISSSTR = time.strftime("%Y%m%d%H%M%S")
 ##############################################################################################################################
 
 def add_raw_index_entry(log_obj, filepath, guid, zipfile, filename):
-    log_obj.write(guid + ',' + filepath + ',' + zipfile + ',' + filename + '\n')
+    log_obj.write(guid + ',' + zipfile + ',' + filepath + ',' + filename + '\n')
 
 def process_is_running(pid, name):
     a = os.popen("tasklist").readlines()
@@ -90,6 +90,9 @@ def main(argv):
     GPLOAD_MAX_RUNTIME_SECS     = int(config.get(CUSTOM_SECTION,'GPLOAD_MAX_RUNTIME_SECS'))
     GPLOAD_RETRIES              = int(config.get(CUSTOM_SECTION,'GPLOAD_RETRIES'))
     DOS_BATCH_FILE              = config.get(CUSTOM_SECTION,'DOS_BATCH_FILE')
+    s3                          = boto3.client('s3')
+    BUCKET_NAME                 = str(config.get(CUSTOM_SECTION,'BUCKET_NAME'))
+
 
     ### LOG FILE VARIABLES #######################################################################################################
     LOGFILENAME=LOG_DIR + 'DQ_IL2_index_raw_msg_' + YYYYMMDDSTR + '.log' # records general script output
@@ -111,6 +114,10 @@ def main(argv):
     if source_dir_list:
        for filename in source_dir_list:
            filedate = re.split('_',filename)[1]
+           year = str(filedate[0:4])
+           month = str(filedate[4:6])
+           day = str(filedate[6:8])
+           date_key_format=(year + '/' + month + '/' + day + '/')
            full_filepath=SOURCE_FILE_DIR + filename
            if os.path.isfile(full_filepath) and filename.upper().startswith('RAW'):
                zip = zipfile.ZipFile(full_filepath)
@@ -122,7 +129,7 @@ def main(argv):
                             if compressed_file.upper().endswith('.TXT'):
                                manifest_guid=re.split("_",os.path.basename(compressed_file))[1]
                                FILE_COUNT+=1
-                               add_raw_index_entry(RAW_FILE_INDEX_LOGFILE,RAW_DONE_PATH + filedate,manifest_guid,filename,compressed_file)
+                               add_raw_index_entry(RAW_FILE_INDEX_LOGFILE,filename,manifest_guid,'s4/raw/' + date_key_format + filename,compressed_file)
                         add_log_entry('INDEXING','INDEXED ' + str(FILE_COUNT) + ' files from ' + filename )
                         zip.close()
                else:
@@ -241,20 +248,45 @@ def main(argv):
       ATTEMPT_NO+=1
 
     ##############################################################################################################################
-    # Move files to Local archive folder
+    # Move files to WFLS
     ##############################################################################################################################
 
-    print '\n*** Moving files to local archive folder'
+    print '\n*** Moving files to Local folder'
 
     if source_dir_list:
        for filename in source_dir_list:
            full_filepath=SOURCE_FILE_DIR + filename
            if os.path.isfile(full_filepath) and filename.upper().startswith('RAW'):
                 if os.path.exists(RAW_DONE_PATH):
-                     shutil.move(full_filepath, RAW_DONE_PATH + filename)
+                    shutil.move(full_filepath, RAW_DONE_PATH + filename)
 
     else:
-       add_log_entry('MOVING FILES TO LOCAL ARCHIVE','No source files')
+       add_log_entry('MOVING FILES TO LOCAL FOLDER','No source files')
+
+    ##############################################################################################################################
+    # Move files to S3 bucket
+    ##############################################################################################################################
+
+    print '\n*** Moving files to S3 and deleting locally'
+
+    raw_dir_list =  [f for f in os.listdir(RAW_DONE_PATH) if re.match("RAW.*\.zip$",f)]
+    if raw_dir_list:
+       for filename in raw_dir_list:
+           filedate = re.split('_',filename)[1]
+	   year = str(filedate[0:4])
+           month = str(filedate[4:6])
+	   day = str(filedate[6:8])
+	   date_key_format=(year + '/' + month + '/' + day + '/')
+           full_filepath=RAW_DONE_PATH + filename
+           add_log_entry('Moving file to S3 : ' + filename, 'Done')
+           if os.path.isfile(full_filepath) and filename.upper().startswith('RAW'):
+                 s3.put_object(Body=full_filepath, Bucket=BUCKET_NAME, Key='s4/raw/' + date_key_format + filename)
+                 os.remove(full_filepath)
+                 add_log_entry('Deleting local file : ' + filename, 'Done')
+
+
+    else:
+       add_log_entry('MOVING FILES TO S3 FAILED','No source files')
 
     ##############################################################################################################################
     # SCRIPT END

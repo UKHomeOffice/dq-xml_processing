@@ -280,7 +280,7 @@ def main(argv):
            full_filepath=RAW_DONE_PATH + filename
            add_log_entry('Moving file to S3 : ' + filename, 'Done')
            if os.path.isfile(full_filepath) and filename.upper().startswith('RAW'):
-                 s3.put_object(Body=full_filepath, Bucket=BUCKET_NAME, Key='s4/raw/' + date_key_format + filename)
+                 s3.upload_file(full_filepath, BUCKET_NAME, 's4/raw/' + date_key_format + filename)
                  os.remove(full_filepath)
                  add_log_entry('Deleting local file : ' + filename, 'Done')
 
